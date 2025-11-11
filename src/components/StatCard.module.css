@@ -1,0 +1,37 @@
+.statCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background-color: #fdfdfd;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  min-width: 200px;
+  flex-grow: 1;
+}
+
+.iconWrapper {
+  font-size: 2.5rem;
+  margin-right: 0;
+  margin-bottom: 1rem;
+  color: #764ba2;
+}
+
+.textWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+.value {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #111;
+}

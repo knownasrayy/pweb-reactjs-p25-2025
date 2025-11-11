@@ -1,28 +1,35 @@
 export interface Genre {
-  id: number;
+  id: string;
   name: string;
 }
 
 export interface Book {
-  id: number;
+  id: string;
   title: string;
   writer: string;
   price: number;
-  stock: number;
+  stockQuantity: number;
   genre: Genre;
   publisher?: string;
   isbn?: string;
   description?: string;
-  publication_year?: number;
+  publicationYear?: number;
   condition?: string;
 }
 
-export interface BookApiResponse {
-  data: Book[];
-  page: number;
-  totalPages: number;
+export interface TransactionDetail {
+  id: string;
+  quantity: number;
+  priceAtBuy: number;
+  book: {
+    id: string;
+    title: string;
+  };
 }
 
-export interface GenreApiResponse {
-  data: Genre[];
+export interface Transaction {
+  id: string;
+  createdAt: string;
+  totalAmount: number;
+  transactionItems: TransactionDetail[];
 }

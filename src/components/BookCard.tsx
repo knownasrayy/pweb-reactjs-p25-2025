@@ -1,35 +1,41 @@
 import React from 'react';
 import type { Book } from '../types';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import styles from './BookCard.module.css';
 
 interface BookCardProps {
   book: Book;
 }
 
 const BookCard: React.FC<BookCardProps> = ({ book }) => {
-  const cardStyle: React.CSSProperties = {
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    padding: '16px',
-    margin: '8px',
-    width: '300px',
-  };
+  const { addItem } = useCart();
 
-  const titleStyle: React.CSSProperties = {
-    fontSize: '1.2rem',
-    fontWeight: 'bold',
-    marginBottom: '8px',
+  const handleAddToCart = (e: React.MouseEvent) => {
+    addItem(book, e);
   };
 
   return (
-    <div style={cardStyle}>
-      <Link to={`/books/${book.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-        <h3 style={titleStyle}>{book.title}</h3>
+    <div className={styles.card}>
+      <Link to={`/books/${book.id}`} className={styles.imageContainer}>
+        {book.image_url ? (
+          <img src={book.image_url} alt={book.title} className={styles.bookImage} />
+        ) : (
+          <div className={styles.imagePlaceholder}>
+            <span>{book.title}</span>
+          </div>
+        )}
       </Link>
-      <p>Penulis: {book.writer}</p>
-      <p>Genre: {book.genre.name}</p>
-      <p>Stok: {book.stock}</p>
-      <p>Harga: Rp {book.price.toLocaleString('id-ID')}</p>
+      <div className={styles.cardContent}>
+        <Link to={`/books/${book.id}`} className={styles.titleLink}>
+          <h3 className={styles.title}>{book.title}</h3>
+        </Link>
+        <p className={styles.writer}>{book.writer}</p>
+        <p className={styles.price}>Rp {book.price.toLocaleString('id-ID')}</p>
+        <button onClick={handleAddToCart} className={styles.cartButton}>
+          Tambah ke Keranjang
+        </button>
+      </div>
     </div>
   );
 };

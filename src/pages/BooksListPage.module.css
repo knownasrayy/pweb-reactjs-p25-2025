@@ -1,0 +1,133 @@
+.pageContainer {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: auto;
+}
+
+.statsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.addButton {
+  padding: 10px 15px;
+  background: #764ba2;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.addButton:hover {
+  background: #613c85;
+}
+
+.controls {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.searchInput,
+.selectInput {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.searchInput {
+  flex-grow: 1;
+}
+
+
+.bookListContainer {
+  overflow: hidden;
+  padding: 1rem 0;
+  width: 100%;
+  position: relative;
+  
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  
+  
+  display: flex;
+  width: 100%;
+}
+
+.bookList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content; 
+  
+  
+  animation: marquee 60s linear infinite;
+}
+
+.bookListContainer:hover .bookList {
+  
+  animation-play-state: paused;
+}
+
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    
+    transform: translateX(-100%);
+  }
+}
+
+.errorText {
+  color: red;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+
+@media (max-width: 768px) {
+  .bookListContainer {
+    display: block;
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  
+  .bookList {
+    animation: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    width: max-content;
+  }
+  
+  
+  .bookList[aria-hidden="true"] {
+    display: none;
+  }
+  
+  .controls {
+    flex-direction: column;
+  }
+}

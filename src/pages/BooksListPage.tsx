@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import { getBooks } from '../services/apiService';
+import { getBooks, getStats } from '../services/apiService';
 import type { Book } from '../types';
 import BookCard from '../components/BookCard';
+import StatCard from '../components/StatCard';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import styles from './BooksListPage.module.css';
+
+interface Stats {
+  totalBooks: number;
+  totalGenres: number;
+  totalTransactions: number;
+}
 
 const BooksListPage = () => {
   const [books, setBooks] = useState<Book[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState('');
   const [condition, setCondition] = useState('');
-  const [sort, setSort] = useState('title-asc');
+  const [sortBy, setSortBy] = useState('title');
+  const [orderBy, setOrderBy] = useState('asc');
 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -26,13 +36,14 @@ const BooksListPage = () => {
           page,
           search: search || undefined,
           condition: condition || undefined,
-          sort,
+          sortBy,
+          orderBy,
         };
         const response = await getBooks(params);
         setBooks(response.data.data);
-        setTotalPages(response.data.totalPages);
+        setTotalPages(response.data.meta.totalPages);
       } catch (err) {
-        setError('Gagal mengambil data buku. Pastikan token Anda valid.');
+        setError('Gagal mengambil data buku.');
         if (axios.isAxiosError(err) && err.response && err.response.status === 401) {
           localStorage.removeItem('token');
           window.location.href = '/login';
@@ -41,9 +52,20 @@ const BooksListPage = () => {
         setIsLoading(false);
       }
     };
-
     fetchBooks();
-  }, [page, search, condition, sort]);
+  }, [page, search, sortBy, orderBy, condition]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await getStats();
+        setStats(response.data.data);
+      } catch (error) {
+        console.error("Gagal mengambil stats:", error);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -56,90 +78,89 @@ const BooksListPage = () => {
   };
 
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSort(e.target.value);
+    const [newSortBy, newOrderBy] = e.target.value.split('-');
+    setSortBy(newSortBy);
+    setOrderBy(newOrderBy);
     setPage(1);
   };
 
-  const containerStyle: React.CSSProperties = {
-    padding: '2rem',
-  };
+  const renderBookList = () => {
+    if (isLoading) return <p>Loading...</p>;
+    if (error) return <p className={styles.errorText}>{error}</p>;
+    if (books.length === 0) return <p>Tidak ada buku yang ditemukan.</p>;
 
-  const controlsStyle: React.CSSProperties = {
-    display: 'flex',
-    gap: '1rem',
-    marginBottom: '1rem',
-    flexWrap: 'wrap',
-  };
+    const displayBooks = [...books];
+    while (displayBooks.length > 0 && displayBooks.length < 10) {
+      displayBooks.push(...books);
+    }
 
-  const listStyle: React.CSSProperties = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  };
-
-  const paginationStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: '1rem',
-    marginTop: '1rem',
+    return (
+      <>
+        <div className={styles.bookListContainer}>
+          <div className={styles.bookList}>
+            {displayBooks.map((book, index) => (
+              <BookCard key={`${book.id}-${index}-a`} book={book} />
+            ))}
+          </div>
+          <div className={styles.bookList} aria-hidden="true">
+            {displayBooks.map((book, index) => (
+              <BookCard key={`${book.id}-${index}-b`} book={book} />
+            ))}
+          </div>
+        </div>
+        
+        <div className={styles.pagination}>
+          <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>
+            Previous
+          </button>
+          <span>Halaman {page} dari {totalPages}</span>
+          <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>
+            Next
+          </button>
+        </div>
+      </>
+    );
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={controlsStyle}>
+    <div className={styles.pageContainer}>
+      
+      {stats && (
+        <div className={styles.statsContainer}>
+          <StatCard icon={"📚"} title="Total Buku" value={stats.totalBooks} />
+          <StatCard icon={"🔖"} title="Total Genre" value={stats.totalGenres} />
+          <StatCard icon={"💳"} title="Total Transaksi" value={stats.totalTransactions} />
+        </div>
+      )}
+
+      <div className={styles.header}>
         <h1>Daftar Buku</h1>
-        <Link to="/books/add" style={{ padding: '10px 15px', background: 'blue', color: 'white', textDecoration: 'none', borderRadius: '5px', height: 'fit-content', alignSelf: 'center' }}>
+        <Link to="/books/add" className={styles.addButton}>
           Tambah Buku
         </Link>
       </div>
-      <div style={controlsStyle}>
+      <div className={styles.controls}>
         <input
           type="text"
           placeholder="Cari berdasarkan judul..."
           value={search}
           onChange={handleSearchChange}
-          style={{ padding: '8px' }}
+          className={styles.searchInput}
         />
-        <select value={condition} onChange={handleConditionChange} style={{ padding: '8px' }}>
+        <select value={`${sortBy}-${orderBy}`} onChange={handleSortChange} className={styles.selectInput}>
+          <option value="title-asc">Judul (A-Z)</option>
+          <option value="title-desc">Judul (Z-A)</option>
+          <option value="publicationYear-asc">Tanggal Terbit (Lama)</option>
+          <option value="publicationYear-desc">Tanggal Terbit (Baru)</option>
+        </select>
+        <select value={condition} onChange={handleConditionChange} className={styles.selectInput}>
           <option value="">Semua Kondisi</option>
           <option value="New">New</option>
           <option value="Used">Used</option>
         </select>
-        <select value={sort} onChange={handleSortChange} style={{ padding: '8px' }}>
-          <option value="title-asc">Judul (A-Z)</option>
-          <option value="title-desc">Judul (Z-A)</option>
-          <option value="date-asc">Tanggal Terbit (Lama)</option>
-          <option value="date-desc">Tanggal Terbit (Baru)</option>
-        </select>
       </div>
 
-      {isLoading && <p>Loading...</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      {!isLoading && !error && books.length === 0 && (
-        <p>Tidak ada buku yang ditemukan.</p>
-      )}
-
-      {!isLoading && !error && books.length > 0 && (
-        <>
-          <div style={listStyle}>
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </div>
-
-          <div style={paginationStyle}>
-            <button onClick={() => setPage(p => p - 1)} disabled={page === 1}>
-              Previous
-            </button>
-            <span>Halaman {page} dari {totalPages}</span>
-            <button onClick={() => setPage(p => p + 1)} disabled={page === totalPages}>
-              Next
-            </button>
-          </div>
-        </>
-      )}
+      {renderBookList()}
     </div>
   );
 };

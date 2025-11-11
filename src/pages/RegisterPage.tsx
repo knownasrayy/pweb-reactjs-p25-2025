@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../services/apiService';
 import { registerSchema } from '../utils/validationSchemas';
 import { z, ZodError } from 'zod';
 import type { ZodIssue } from 'zod';
+import styles from './AuthForm.module.css';
 
 const RegisterPage = () => {
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -20,7 +21,7 @@ const RegisterPage = () => {
     setApiError(null);
 
     try {
-      registerSchema.parse({ name, email, password });
+      registerSchema.parse({ username, email, password });
     } catch (error) {
       if (error instanceof ZodError) {
         const fieldErrors: Record<string, string> = {};
@@ -36,7 +37,7 @@ const RegisterPage = () => {
 
     setIsLoading(true);
     try {
-      await registerUser({ name, email, password });
+      await registerUser({ username, email, password });
       navigate('/login');
     } catch (error) {
       setApiError('Registrasi gagal. Email mungkin sudah terdaftar.');
@@ -46,44 +47,56 @@ const RegisterPage = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: '400px', margin: 'auto' }}>
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-          />
-          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
+    <div className={styles.pageContainer}>
+      <div className={styles.authContainer}>
+        <div className={styles.promoPanel}>
+          <h2>Buat Akun Baru</h2>
+          <p>Mulai koleksi buku digital-mu dan lacak semua transaksimu dengan mudah.</p>
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-          />
-          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
+        <div className={styles.formPanel}>
+          <h1>Create an Account</h1>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.field}>
+              <label>Username</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+              {errors.username && <p className={styles.fieldError}>{errors.username}</p>}
+            </div>
+
+            <div className={styles.field}>
+              <label>Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              {errors.email && <p className={styles.fieldError}>{errors.email}</p>}
+            </div>
+
+            <div className={styles.field}>
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {errors.password && <p className={styles.fieldError}>{errors.password}</p>}
+            </div>
+            
+            {apiError && <p className={styles.apiError}>{apiError}</p>}
+            
+            <button type="submit" disabled={isLoading} className={styles.submitButton}>
+              {isLoading ? 'Loading...' : 'Buat Akun'}
+            </button>
+          </form>
+          <div className={styles.toggleLink}>
+            Sudah punya akun? <Link to="/login">Login di sini</Link>
+          </div>
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-          />
-          {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
-        </div>
-        {apiError && <p style={{ color: 'red' }}>{apiError}</p>}
-        <button type="submit" disabled={isLoading} style={{ padding: '10px 15px' }}>
-          {isLoading ? 'Loading...' : 'Register'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

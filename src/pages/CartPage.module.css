@@ -1,0 +1,136 @@
+.pageContainer {
+  max-width: 1400px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
+}
+
+.cartItems {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.cartHeader {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+}
+
+.cartTableHead {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #000;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #555;
+}
+
+.tableHeadPrice {
+  text-align: right;
+}
+
+.summaryCard {
+  background-color: #1a1a2e;
+  color: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 2rem;
+}
+
+.summaryIcon {
+  font-size: 3rem;
+  text-align: center;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.summaryMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #eee;
+  margin-bottom: 2rem;
+}
+
+.summaryDetails {
+  margin-bottom: 2rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.summaryRow span:first-child {
+  color: #aaa;
+}
+
+.summaryTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding-top: 1rem;
+  border-top: 1px solid #444;
+}
+
+.checkoutButton {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #fff;
+  background: #764ba2;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.checkoutButton:hover {
+  background: #613c85;
+}
+
+.checkoutButton:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.errorText {
+  color: #d9534f;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.continueShopping {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+
+@media (max-width: 900px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+  }
+
+  .cartTableHead {
+    display: none;
+  }
+}

@@ -1,23 +1,53 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import styles from './Navbar.module.css';
+import React, { useRef, useEffect } from 'react';
 
 const Navbar = () => {
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
+  const { state: cartState, setCartIconRef } = useCart();
+  const { user, logout } = useAuth();
+  const cartLinkRef = useRef<HTMLAnchorElement>(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  
+  useEffect(() => {
+    if (cartLinkRef.current) {
+      setCartIconRef(cartLinkRef.current);
+    }
+  }, [cartLinkRef, setCartIconRef]);
+
+  const cartItemCount = cartState.items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const getNavLinkClass = ({ isActive }: { isActive: boolean }) =>
+    isActive ? `${styles.navLink} ${styles.navLinkActive}` : styles.navLink;
 
   return (
-    <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', background: '#eee' }}>
-      <Link to="/books">Buku</Link>
-      <Link to="/transactions">Transaksi</Link>
+    <nav className={styles.navbar}>
+      <NavLink to="/books" className={getNavLinkClass}>
+        Buku
+      </NavLink>
+      <NavLink to="/transactions" className={getNavLinkClass}>
+        Transaksi
+      </NavLink>
       
-      {token ? (
-        <button onClick={handleLogout}>Logout</button>
+      {/* Pasang ref ke link Keranjang */}
+      <NavLink 
+        to="/cart" 
+        className={getNavLinkClass} 
+        ref={cartLinkRef}
+      >
+        Keranjang ({cartItemCount})
+      </NavLink>
+      
+      {user ? (
+        <div className={styles.userInfo}>
+          <span className={styles.email}>{user.email}</span>
+          <button onClick={logout} className={styles.logoutButton}>Logout</button>
+        </div>
       ) : (
-        <Link to="/login">Login</Link>
+        <div className={styles.userInfo}>
+          <NavLink to="/login" className={styles.navLink}>Login</NavLink>
+        </div>
       )}
     </nav>
   );
